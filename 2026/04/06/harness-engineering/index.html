@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"zeroicey.me","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Harness（马具&#x2F;框架）是 AI 智能体中除了模型本身以外的所有东西。一个良好的 harness 服务于两个目标：提高智能体一次做对的概率，以及提供反馈循环帮助自我纠正。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Harness Engineering 知识整理">
+<meta property="og:url" content="https://zeroicey.me/2026/04/06/harness-engineering/index.html">
+<meta property="og:site_name" content="Zeroicey&#39;s Blog">
+<meta property="og:description" content="Harness（马具&#x2F;框架）是 AI 智能体中除了模型本身以外的所有东西。一个良好的 harness 服务于两个目标：提高智能体一次做对的概率，以及提供反馈循环帮助自我纠正。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-06T10:55:23.000Z">
+<meta property="article:modified_time" content="2026-04-06T10:55:57.980Z">
+<meta property="article:author" content="zeroicey">
+<meta property="article:tag" content="AI Agent">
+<meta property="article:tag" content="Harness">
+<meta property="article:tag" content="软件工程">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://zeroicey.me/2026/04/06/harness-engineering/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zeroicey.me/2026/04/06/harness-engineering/","path":"2026/04/06/harness-engineering/","title":"Harness Engineering 知识整理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Harness Engineering 知识整理 | Zeroicey's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Zeroicey's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Coding & Life</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Harness-Engineering-%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">Harness Engineering 知识整理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">核心概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A4%E5%A4%A7%E6%8E%A7%E5%88%B6%E6%9C%BA%E5%88%B6"><span class="nav-number">1.2.</span> <span class="nav-text">两大控制机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Feedforward%EF%BC%88%E5%89%8D%E9%A6%88%E6%8E%A7%E5%88%B6%EF%BC%89"><span class="nav-number">1.2.1.</span> <span class="nav-text">1. Feedforward（前馈控制）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Feedback%EF%BC%88%E5%8F%8D%E9%A6%88%E6%8E%A7%E5%88%B6%EF%BC%89"><span class="nav-number">1.2.2.</span> <span class="nav-text">2. Feedback（反馈控制）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A4%E7%A7%8D%E6%89%A7%E8%A1%8C%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.3.</span> <span class="nav-text">两种执行类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E5%A4%A7%E7%9B%91%E7%AE%A1%E7%B1%BB%E5%88%AB"><span class="nav-number">1.4.</span> <span class="nav-text">三大监管类别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Maintainability-Harness%EF%BC%88%E5%8F%AF%E7%BB%B4%E6%8A%A4%E6%80%A7-harness%EF%BC%89"><span class="nav-number">1.4.1.</span> <span class="nav-text">1. Maintainability Harness（可维护性 harness）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Architecture-Fitness-Harness%EF%BC%88%E6%9E%B6%E6%9E%84%E9%80%82%E5%BA%94%E6%80%A7-harness%EF%BC%89"><span class="nav-number">1.4.2.</span> <span class="nav-text">2. Architecture Fitness Harness（架构适应性 harness）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Behaviour-Harness%EF%BC%88%E8%A1%8C%E4%B8%BA-harness%EF%BC%89"><span class="nav-number">1.4.3.</span> <span class="nav-text">3. Behaviour Harness（行为 harness）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Harnessability%EF%BC%88%E5%8F%AF-harness-%E6%80%A7%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">Harnessability（可 harness 性）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%8E%9F%E5%88%99"><span class="nav-number">1.6.</span> <span class="nav-text">关键原则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Ashby%E2%80%99s-Law%EF%BC%88%E5%BF%85%E8%A6%81%E5%A4%9A%E6%A0%B7%E6%80%A7%E5%AE%9A%E5%BE%8B%EF%BC%89"><span class="nav-number">1.6.1.</span> <span class="nav-text">Ashby’s Law（必要多样性定律）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Timing-Keep-Quality-Left%EF%BC%88%E8%B4%A8%E9%87%8F%E5%B7%A6%E7%A7%BB%EF%BC%89"><span class="nav-number">1.6.2.</span> <span class="nav-text">Timing: Keep Quality Left（质量左移）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E8%B7%B5%E6%A1%88%E4%BE%8B"><span class="nav-number">1.7.</span> <span class="nav-text">实践案例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenAI"><span class="nav-number">1.7.1.</span> <span class="nav-text">OpenAI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Stripe"><span class="nav-number">1.7.2.</span> <span class="nav-text">Stripe</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%95%BF%E6%97%B6%E9%97%B4%E8%BF%90%E8%A1%8C%E6%99%BA%E8%83%BD%E4%BD%93%E7%9A%84-Harness-%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.8.</span> <span class="nav-text">长时间运行智能体的 Harness 设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%8C%91%E6%88%98"><span class="nav-number">1.8.1.</span> <span class="nav-text">核心挑战</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%A4%E9%83%A8%E5%88%86%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.8.2.</span> <span class="nav-text">两部分解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Initializer-Agent%EF%BC%88%E5%88%9D%E5%A7%8B%E5%8C%96%E6%99%BA%E8%83%BD%E4%BD%93%EF%BC%89"><span class="nav-number">1.8.2.1.</span> <span class="nav-text">1. Initializer Agent（初始化智能体）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Coding-Agent%EF%BC%88%E7%BC%96%E7%A0%81%E6%99%BA%E8%83%BD%E4%BD%93%EF%BC%89"><span class="nav-number">1.8.2.2.</span> <span class="nav-text">2. Coding Agent（编码智能体）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E7%BB%84%E4%BB%B6"><span class="nav-number">1.8.3.</span> <span class="nav-text">关键组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Feature-List%EF%BC%88%E5%8A%9F%E8%83%BD%E5%88%97%E8%A1%A8%EF%BC%89"><span class="nav-number">1.8.3.1.</span> <span class="nav-text">Feature List（功能列表）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E7%A4%BA"><span class="nav-number">1.8.4.</span> <span class="nav-text">启示</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenAI-%E7%9A%84-Harness-Engineering-%E5%AE%9E%E8%B7%B5"><span class="nav-number">1.9.</span> <span class="nav-text">OpenAI 的 Harness Engineering 实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%88%90%E6%9E%9C"><span class="nav-number">1.9.1.</span> <span class="nav-text">核心成果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E7%BB%8F%E9%AA%8C"><span class="nav-number">1.9.2.</span> <span class="nav-text">关键经验</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E4%BB%8E%E7%A9%BA%E4%BB%93%E5%BA%93%E5%BC%80%E5%A7%8B"><span class="nav-number">1.9.2.1.</span> <span class="nav-text">1. 从空仓库开始</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E9%87%8D%E6%96%B0%E5%AE%9A%E4%B9%89%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%A7%92%E8%89%B2"><span class="nav-number">1.9.2.2.</span> <span class="nav-text">2. 重新定义工程师角色</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E7%BB%99%E6%99%BA%E8%83%BD%E4%BD%93%E2%80%9D%E5%9C%B0%E5%9B%BE%E2%80%9D%E8%80%8C%E9%9D%9E%E2%80%9D%E8%AF%B4%E6%98%8E%E4%B9%A6%E2%80%9D"><span class="nav-number">1.9.2.3.</span> <span class="nav-text">3. 给智能体”地图”而非”说明书”</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E7%9B%AE%E6%A0%87%E6%98%AF%E6%99%BA%E8%83%BD%E4%BD%93%E7%9A%84%E5%8F%AF%E8%AF%BB%E6%80%A7"><span class="nav-number">1.9.2.4.</span> <span class="nav-text">4. 目标是智能体的可读性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E9%80%9A%E8%BF%87%E7%BA%A6%E6%9D%9F%E8%80%8C%E9%9D%9E%E5%BE%AE%E8%A7%82%E7%AE%A1%E7%90%86"><span class="nav-number">1.9.2.5.</span> <span class="nav-text">5. 通过约束而非微观管理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-%E7%86%B5%E4%B8%8E%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86"><span class="nav-number">1.9.2.6.</span> <span class="nav-text">6. 熵与垃圾收集</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%B4%9E%E5%AF%9F"><span class="nav-number">1.9.3.</span> <span class="nav-text">核心洞察</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%BA%90"><span class="nav-number">1.10.</span> <span class="nav-text">参考资源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%96%87%E7%8C%AE"><span class="nav-number">1.10.1.</span> <span class="nav-text">核心文献</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="zeroicey"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">zeroicey</p>
+  <div class="site-description" itemprop="description">Go to the dock to order some french fries.</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zeroicey" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zeroicey" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zeroicey.me/2026/04/06/harness-engineering/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="zeroicey">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zeroicey's Blog">
+      <meta itemprop="description" content="Go to the dock to order some french fries.">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Harness Engineering 知识整理 | Zeroicey's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Harness Engineering 知识整理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2026-04-06 18:55:23 / 修改时间：18:55:57" itemprop="dateCreated datePublished" datetime="2026-04-06T18:55:23+08:00">2026-04-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%8A%80%E6%9C%AF%E8%A7%A3%E6%9E%90/" itemprop="url" rel="index"><span itemprop="name">技术解析</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.5k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Harness（马具&#x2F;框架）是 AI 智能体中<strong>除了模型本身以外的所有东西</strong>。一个良好的 harness 服务于两个目标：提高智能体一次做对的概率，以及提供反馈循环帮助自我纠正。</p>
+<span id="more"></span>
+
+<h1 id="Harness-Engineering-知识整理"><a href="#Harness-Engineering-知识整理" class="headerlink" title="Harness Engineering 知识整理"></a>Harness Engineering 知识整理</h1><blockquote>
+<p>来源：<a target="_blank" rel="noopener" href="https://martinfowler.com/articles/harness-engineering.html">Harness engineering for coding agent users - Martin Fowler</a></p>
+</blockquote>
+<hr>
+<h2 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h2><p><strong>Agent &#x3D; Model + Harness</strong></p>
+<p>一个良好的外部 harness 服务于两个目标：</p>
+<ol>
+<li>提高智能体一次做对的概率</li>
+<li>提供反馈循环，在问题传到人眼之前尽可能自我纠正</li>
+</ol>
+<hr>
+<h2 id="两大控制机制"><a href="#两大控制机制" class="headerlink" title="两大控制机制"></a>两大控制机制</h2><h3 id="1-Feedforward（前馈控制）"><a href="#1-Feedforward（前馈控制）" class="headerlink" title="1. Feedforward（前馈控制）"></a>1. Feedforward（前馈控制）</h3><ul>
+<li>提前预测智能体不应该产生的输出，并尝试阻止</li>
+<li>在智能体行动<strong>之前</strong>引导其行为</li>
+<li>目的：提高智能体一次创建好结果的概率</li>
+</ul>
+<h3 id="2-Feedback（反馈控制）"><a href="#2-Feedback（反馈控制）" class="headerlink" title="2. Feedback（反馈控制）"></a>2. Feedback（反馈控制）</h3><ul>
+<li>在智能体行动后观察结果</li>
+<li>帮助智能体进行<strong>自我纠正</strong></li>
+<li>特别强大的是那些为 LLM 消费优化的信号，例如自定义 linter 消息包含自我纠正指令</li>
+</ul>
+<blockquote>
+<p><strong>关键洞察</strong>：只有反馈的智能体会重复同样的错误；只有前馈的智能体会制定规则但从不知道它们是否有效。</p>
+</blockquote>
+<hr>
+<h2 id="两种执行类型"><a href="#两种执行类型" class="headerlink" title="两种执行类型"></a>两种执行类型</h2><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>特点</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Computational（计算型）</strong></td>
+<td>确定性的、快速的，由 CPU 运行</td>
+<td>测试、linter、类型检查、结构分析</td>
+</tr>
+<tr>
+<td><strong>Inferential（推断型）</strong></td>
+<td>语义分析、AI 代码审查，由 GPU 运行</td>
+<td>LLM as judge</td>
+</tr>
+</tbody></table>
+<p><strong>权衡：</strong></p>
+<ul>
+<li>Computational 控制：便宜、快速，可对每次变更运行</li>
+<li>Inferential 控制：更贵、非确定性，但能提供更丰富的指导和额外的语义判断</li>
+</ul>
+<hr>
+<h2 id="三大监管类别"><a href="#三大监管类别" class="headerlink" title="三大监管类别"></a>三大监管类别</h2><h3 id="1-Maintainability-Harness（可维护性-harness）"><a href="#1-Maintainability-Harness（可维护性-harness）" class="headerlink" title="1. Maintainability Harness（可维护性 harness）"></a>1. Maintainability Harness（可维护性 harness）</h3><p>调节内部代码质量和可维护性。</p>
+<p><strong>例子：</strong></p>
+<ul>
+<li>计算型传感器：重复代码、循环复杂度、缺失测试覆盖率、架构漂移、风格违规</li>
+<li>推断型传感器：语义重复代码、冗余测试、暴力修复、过度工程</li>
+</ul>
+<p><strong>局限性：</strong> 无法可靠地捕捉高影响问题，如：误诊问题、过度工程、不必要的功能、理解错误的指令。</p>
+<h3 id="2-Architecture-Fitness-Harness（架构适应性-harness）"><a href="#2-Architecture-Fitness-Harness（架构适应性-harness）" class="headerlink" title="2. Architecture Fitness Harness（架构适应性 harness）"></a>2. Architecture Fitness Harness（架构适应性 harness）</h3><p>定义和检查应用的架构特性（Fitness Functions）。</p>
+<p><strong>例子：</strong></p>
+<ul>
+<li>前馈：描述性能要求的 Skills，性能测试</li>
+<li>反馈：检查是否改善或降低了性能要求</li>
+</ul>
+<h3 id="3-Behaviour-Harness（行为-harness）"><a href="#3-Behaviour-Harness（行为-harness）" class="headerlink" title="3. Behaviour Harness（行为 harness）"></a>3. Behaviour Harness（行为 harness）</h3><p>指导并感知应用的功能行为是否如预期工作。</p>
+<p><strong>当前做法：</strong></p>
+<ul>
+<li>前馈：功能规范（从简短提示到多文件描述）</li>
+<li>反馈：AI 生成的测试套件是否通过、覆盖率、结合人工测试</li>
+</ul>
+<blockquote>
+<p>这是最大的挑战——目前让智能体高自主工作的团队大多依赖 AI 生成的测试，质量还不够好。</p>
+</blockquote>
+<hr>
+<h2 id="Harnessability（可-harness-性）"><a href="#Harnessability（可-harness-性）" class="headerlink" title="Harnessability（可 harness 性）"></a>Harnessability（可 harness 性）</h2><p>不是每个代码库都同样容易使用 harness。特性：</p>
+<ul>
+<li>强类型语言：有类型检查作为传感器</li>
+<li>清晰的模块边界：支持架构约束规则</li>
+<li>框架抽象：隐藏智能体不必担心的细节</li>
+</ul>
+<p><strong>Ambient Affordances（环境可供性）：</strong></p>
+<blockquote>
+<p>“环境的结构属性，使其对在其中运行的智能体可读、可导航、可处理”</p>
+</blockquote>
+<ul>
+<li><strong>Greenfield</strong>：从第一天就可以内置可 harness 性</li>
+<li><strong>Legacy</strong>：技术债务多的应用最需要 harness，但也是最难构建的</li>
+</ul>
+<hr>
+<h2 id="关键原则"><a href="#关键原则" class="headerlink" title="关键原则"></a>关键原则</h2><h3 id="Ashby’s-Law（必要多样性定律）"><a href="#Ashby’s-Law（必要多样性定律）" class="headerlink" title="Ashby’s Law（必要多样性定律）"></a>Ashby’s Law（必要多样性定律）</h3><blockquote>
+<p>调节器必须至少有与其治理的系统一样多的多样性</p>
+</blockquote>
+<p>LLM 智能体几乎可以生成任何东西，但<strong>承诺一种拓扑结构会缩小空间</strong>，使全面的 harness 更容易实现。</p>
+<h3 id="Timing-Keep-Quality-Left（质量左移）"><a href="#Timing-Keep-Quality-Left（质量左移）" class="headerlink" title="Timing: Keep Quality Left（质量左移）"></a>Timing: Keep Quality Left（质量左移）</h3><p>尽可能在开发时间线的左侧（更早阶段）进行检查：</p>
+<ul>
+<li>什么应该在集成前甚至提交前运行？（linter、快速测试套件）</li>
+<li>什么更昂贵，应该只在流水线中运行？（突变测试、更全面的代码审查）</li>
+</ul>
+<hr>
+<h2 id="实践案例"><a href="#实践案例" class="headerlink" title="实践案例"></a>实践案例</h2><h3 id="OpenAI"><a href="#OpenAI" class="headerlink" title="OpenAI"></a>OpenAI</h3><ul>
+<li>分层架构由自定义 linter 和结构测试强制执行</li>
+<li>定期”垃圾收集”扫描漂移并让智能体建议修复</li>
+</ul>
+<h3 id="Stripe"><a href="#Stripe" class="headerlink" title="Stripe"></a>Stripe</h3><ul>
+<li>基于启发式的相关 linter 预推送钩子</li>
+<li>“蓝图”将反馈传感器集成到智能体工作流中</li>
+</ul>
+<hr>
+<h2 id="长时间运行智能体的-Harness-设计"><a href="#长时间运行智能体的-Harness-设计" class="headerlink" title="长时间运行智能体的 Harness 设计"></a>长时间运行智能体的 Harness 设计</h2><blockquote>
+<p>基于 <a target="_blank" rel="noopener" href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents">Effective harnesses for long-running agents</a></p>
+</blockquote>
+<h3 id="核心挑战"><a href="#核心挑战" class="headerlink" title="核心挑战"></a>核心挑战</h3><p>长时间运行的智能体面临两个主要问题：</p>
+<ol>
+<li><strong>一次做太多</strong>：智能体试图一次性完成整个应用，导致上下文耗尽</li>
+<li><strong>过早宣布胜利</strong>：在构建了一些功能后，后续的智能体会看到已经完成的进展，然后宣布工作完成</li>
+</ol>
+<h3 id="两部分解决方案"><a href="#两部分解决方案" class="headerlink" title="两部分解决方案"></a>两部分解决方案</h3><h4 id="1-Initializer-Agent（初始化智能体）"><a href="#1-Initializer-Agent（初始化智能体）" class="headerlink" title="1. Initializer Agent（初始化智能体）"></a>1. Initializer Agent（初始化智能体）</h4><p>第一个智能体会话专门负责：</p>
+<ul>
+<li>设置初始环境（<code>init.sh</code> 脚本）</li>
+<li>创建 <code>claude-progress.txt</code> 进度日志文件</li>
+<li>创建详细的 feature list（功能列表）</li>
+<li>进行初始 git 提交</li>
+</ul>
+<h4 id="2-Coding-Agent（编码智能体）"><a href="#2-Coding-Agent（编码智能体）" class="headerlink" title="2. Coding Agent（编码智能体）"></a>2. Coding Agent（编码智能体）</h4><p>每个后续会话：</p>
+<ul>
+<li>读取进度文件和 git 历史了解状态</li>
+<li>每次只做一个功能（增量进展）</li>
+<li>结束时提交 git 并更新进度文件</li>
+</ul>
+<h3 id="关键组件"><a href="#关键组件" class="headerlink" title="关键组件"></a>关键组件</h3><h4 id="Feature-List（功能列表）"><a href="#Feature-List（功能列表）" class="headerlink" title="Feature List（功能列表）"></a>Feature List（功能列表）</h4><p>使用结构化的 JSON 文件列出所有需要实现的功能：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;category&quot;</span><span class="punctuation">:</span> <span class="string">&quot;functional&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;New chat button creates a fresh conversation&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;steps&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;Navigate to main interface&quot;</span><span class="punctuation">,</span> <span class="string">&quot;Click the &#x27;New Chat&#x27; button&quot;</span><span class="punctuation">,</span> ...<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;passes&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>规则</strong>：智能体只能修改 <code>passes</code> 字段，不能删除或修改测试。</p>
+<h3 id="启示"><a href="#启示" class="headerlink" title="启示"></a>启示</h3><blockquote>
+<p>有效软件工程师每天做什么，我们就向智能体学习什么</p>
+</blockquote>
+<ul>
+<li>每次只做一个任务</li>
+<li>留下清晰的进度供下一个”工程师”阅读</li>
+<li>在开始新工作前验证基本功能仍然正常</li>
+<li>使用 git 回滚错误的代码更改</li>
+</ul>
+<hr>
+<h2 id="OpenAI-的-Harness-Engineering-实践"><a href="#OpenAI-的-Harness-Engineering-实践" class="headerlink" title="OpenAI 的 Harness Engineering 实践"></a>OpenAI 的 Harness Engineering 实践</h2><blockquote>
+<p>基于 <a target="_blank" rel="noopener" href="https://openai.com/index/harness-engineering/">在智能体优先的世界中利用 Codex</a></p>
+</blockquote>
+<h3 id="核心成果"><a href="#核心成果" class="headerlink" title="核心成果"></a>核心成果</h3><ul>
+<li><strong>5 个月构建 100 万行代码</strong></li>
+<li><strong>3 人团队 → 每天 3.5 个 PR</strong></li>
+<li><strong>零人工代码贡献</strong> - 所有代码由 Codex 编写</li>
+</ul>
+<h3 id="关键经验"><a href="#关键经验" class="headerlink" title="关键经验"></a>关键经验</h3><h4 id="1-从空仓库开始"><a href="#1-从空仓库开始" class="headerlink" title="1. 从空仓库开始"></a>1. 从空仓库开始</h4><ul>
+<li>初始架构由 Codex 使用 GPT-5 生成</li>
+<li>AGENTS.md 也是由 Codex 编写</li>
+<li>完全没有预存人工代码</li>
+</ul>
+<h4 id="2-重新定义工程师角色"><a href="#2-重新定义工程师角色" class="headerlink" title="2. 重新定义工程师角色"></a>2. 重新定义工程师角色</h4><blockquote>
+<p><strong>人类掌舵，智能体执行</strong></p>
+</blockquote>
+<p>工程师的工作不再是写代码，而是：</p>
+<ul>
+<li>设计环境</li>
+<li>明确意图</li>
+<li>构建反馈回路</li>
+</ul>
+<h4 id="3-给智能体”地图”而非”说明书”"><a href="#3-给智能体”地图”而非”说明书”" class="headerlink" title="3. 给智能体”地图”而非”说明书”"></a>3. 给智能体”地图”而非”说明书”</h4><p>❌ <strong>失败的尝试</strong>：一个巨大的 AGENTS.md（1000页手册）</p>
+<ul>
+<li>情境是稀缺资源</li>
+<li>过多指导变得无效</li>
+<li>文档会快速腐烂</li>
+<li>难以验证</li>
+</ul>
+<p>✅ <strong>正确做法</strong>：AGENTS.md 作为”内容目录”（约100行）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">AGENTS.md        → 地图，指向其他地方</span><br><span class="line">ARCHITECTURE.md  → 域和包的顶层地图</span><br><span class="line">docs/            → 真正的知识来源</span><br><span class="line">  ├── design-docs/</span><br><span class="line">  ├── exec-plans/</span><br><span class="line">  ├── references/</span><br><span class="line">  └── ...</span><br></pre></td></tr></table></figure>
+
+<p><strong>渐进式披露</strong>：从一个小而稳定的切入点开始，智能体被引导下一步该去哪里查看。</p>
+<h4 id="4-目标是智能体的可读性"><a href="#4-目标是智能体的可读性" class="headerlink" title="4. 目标是智能体的可读性"></a>4. 目标是智能体的可读性</h4><blockquote>
+<p>从智能体的角度看：运行时无法访问的任何内容都不存在</p>
+</blockquote>
+<ul>
+<li>存储在 Google Docs、Slack、人类头脑中的知识都无法被访问</li>
+<li>代码仓库本地的、版本化的工件是智能体能看到的全部</li>
+<li>需要将情境推送到仓库中</li>
+</ul>
+<h4 id="5-通过约束而非微观管理"><a href="#5-通过约束而非微观管理" class="headerlink" title="5. 通过约束而非微观管理"></a>5. 通过约束而非微观管理</h4><ul>
+<li>严格边界和可预测结构是关键</li>
+<li>自定义 linter 强制执行架构规则</li>
+<li>结构测试验证依赖方向</li>
+</ul>
+<p><strong>分层领域架构</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Types → Config → Repo</span><br><span class="line">Providers → Service → Runtime → UI</span><br></pre></td></tr></table></figure>
+
+<h4 id="6-熵与垃圾收集"><a href="#6-熵与垃圾收集" class="headerlink" title="6. 熵与垃圾收集"></a>6. 熵与垃圾收集</h4><p>智能体会复制现有模式（包括不理想的模式），导致<strong>漂移</strong>。</p>
+<p><strong>解决方案</strong>：”黄金原则” + 定期清理</p>
+<ul>
+<li>将品味编码为机械规则</li>
+<li>定期运行后台任务扫描偏差</li>
+<li>技术债务就像高息贷款：小额定期偿还 &gt; 痛苦一次性解决</li>
+</ul>
+<h3 id="核心洞察"><a href="#核心洞察" class="headerlink" title="核心洞察"></a>核心洞察</h3><blockquote>
+<p><strong>构建软件仍然需要纪律，但纪律更多地体现在支撑结构上，而不是代码上。</strong></p>
+</blockquote>
+<p>最棘手的挑战集中在：</p>
+<ul>
+<li><strong>设计环境</strong></li>
+<li><strong>反馈回路</strong></li>
+<li><strong>控制系统</strong></li>
+</ul>
+<hr>
+<h2 id="参考资源"><a href="#参考资源" class="headerlink" title="参考资源"></a>参考资源</h2><h3 id="核心文献"><a href="#核心文献" class="headerlink" title="核心文献"></a>核心文献</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://martinfowler.com/articles/harness-engineering.html">Harness engineering for coding agent users - Martin Fowler</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents">Effective harnesses for long-running agents - Anthropic</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.anthropic.com/engineering/harness-design-long-running-apps">Harness design for long-running application development - Anthropic</a></li>
+<li><a target="_blank" rel="noopener" href="https://openai.com/index/harness-engineering/">Harness engineering: leveraging Codex in an agent-first world - OpenAI</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.langchain.com/the-anatomy-of-an-agent-harness/">The anatomy of an agent harness - LangChain</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">Demystifying evals for AI agents - Anthropic</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI-Agent/" rel="tag"># AI Agent</a>
+              <a href="/tags/Harness/" rel="tag"># Harness</a>
+              <a href="/tags/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/" rel="tag"># 软件工程</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/04/06/openclaw-analysis/" rel="prev" title="OpenCLAW 原理解析">
+                  <i class="fa fa-angle-left"></i> OpenCLAW 原理解析
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">zeroicey</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">9k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">8 分钟</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/zeroicey" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
